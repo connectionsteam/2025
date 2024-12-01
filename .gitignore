@@ -2,8 +2,7 @@
 node_modules/
 package-lock.json
 
-# Lib tests
+# Internals
+.env
 index.test.ts
-
-# Dist
-dist/
+bun.lockb

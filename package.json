@@ -1,30 +1,26 @@
 {
-    "name": "tsbase",
-    "version": "1.0.0",
-    "description": "Base for all TypeScript projects",
-    "main": "src/index.ts",
-    "scripts": {
-        "test": "tsx index.test.ts",
-        "lint:fix": "eslint . --fix",
-        "prettier:json": "prettier --write \"**/*.json\"",
-        "prettier:fix": "prettier --write \"**/*.{js,ts}\"",
-        "prettier:md": "prettier --write \"**/*.{mdx,md}\"",
-        "prettier:all": "prettier --write ."
-    },
-    "keywords": [],
-    "author": {
-        "name": "escoteiros",
-        "url": "https://github.com/yUnreal",
-        "email": "unrealwebdev@gmail.com"
-    },
-    "license": "ISC",
-    "devDependencies": {
-        "@typescript-eslint/eslint-plugin": "^5.60.1",
-        "@typescript-eslint/parser": "^5.60.1",
-        "eslint": "^8.43.0",
-        "eslint-config-prettier": "^8.8.0",
-        "prettier": "^3.0.0",
-        "tsx": "^4.7.0",
-        "typescript": "^5.1.6"
-    }
+	"name": "connections-2025",
+	"description": "Connections for 2025",
+	"module": "src/index.ts",
+	"type": "module",
+	"scripts": {
+		"test": "bun run index.test.ts",
+		"format": "bunx biome check --write .",
+		"format:ts": "bunx biome check --write *.ts",
+		"app": "bun run src/index.ts"
+	},
+	"devDependencies": {
+		"@types/bun": "latest"
+	},
+	"dependencies": {
+		"@biomejs/biome": "^1.9.4",
+		"@types/ms": "^0.7.34",
+		"cron": "^3.1.7",
+		"mongoose": "^8.7.0",
+		"ms": "^2.1.3",
+		"seyfert": "^2.1.0"
+	},
+	"peerDependencies": {
+		"typescript": "^5.0.0"
+	}
 }
