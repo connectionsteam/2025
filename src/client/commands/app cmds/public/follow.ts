@@ -22,9 +22,11 @@ export default class FollowCommand extends Command {
 		const { user: me } = context.metadata;
 		const { target } = context;
 
-		if (target.id === context.client.me.id) return context.editOrReply({
-			content: 'Why you are trying to follow the best connection app? Follow me in **X**!\nhttps://x.com/ConnectionsBot'
-		})
+		if (target.id === context.client.me.id)
+			return context.editOrReply({
+				content:
+					'Why you are trying to follow the best connection app? Follow me in **X**!\nhttps://x.com/ConnectionsBot',
+			});
 		if (me.follows.includes(target.id))
 			return context.editOrReply({
 				content: `You are already following **${target.username}**.`,

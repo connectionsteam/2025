@@ -8,10 +8,12 @@ const guildSchema = new Schema<Guild>({
 	},
 	prefix: String,
 	mods: {
-		type: [{
-			id: String,
-			type: Number,
-		}],
+		type: [
+			{
+				id: String,
+				type: Number,
+			},
+		],
 	},
 	premium: {
 		type: {
