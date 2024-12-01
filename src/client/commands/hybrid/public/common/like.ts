@@ -14,13 +14,12 @@ const options = {
 		description: 'Enter the name of connection to like',
 		async autocomplete(interaction) {
 			const name = interaction.options.getAutocompleteValue();
-
-			if (!name) return;
+			const isEmpty = !name?.length;
 
 			const topConnections = await connections.aggregate([
 				{
 					$match:
-						name.length === 0 ? {} : { name: { $regex: name, $options: 'i' } },
+						isEmpty ? {} : { name: { $regex: name, $options: 'i' } },
 				},
 				{
 					$project: {
@@ -30,7 +29,7 @@ const options = {
 					},
 				},
 				{ $sort: { likesCount: -1 } },
-				{ $limit: name.length === 0 ? 5 : 25 },
+				{ $limit: isEmpty ? 5 : 25 },
 			]);
 
 			if (topConnections.length === 0)
