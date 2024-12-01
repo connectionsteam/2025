@@ -14,6 +14,10 @@ export interface User {
 	notifications?: Notification[];
 	bookmarks: Record<string, UserBookmark>;
 	follows: string[];
+	/**
+	 * Trending Top Messages counter
+	 */
+	ttmCount?: number;
 }
 
 export interface Achievement {

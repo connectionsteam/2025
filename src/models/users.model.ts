@@ -58,6 +58,7 @@ const userSchema = new Schema<User>({
 		type: [String],
 		default: [],
 	},
+	ttmCount: Number,
 });
 
 export const users = model('users', userSchema);
