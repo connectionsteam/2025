@@ -23,6 +23,7 @@ const messageSchema = new Schema<ConnectionMessage>({
 		type: String,
 		required: true,
 	},
+	reference: String,
 }).index({ 'children.id': 1, channelId: 1 });
 
 export const messages = model('messages', messageSchema);

@@ -5,6 +5,7 @@ export interface MessageChild {
 
 export interface ConnectionMessage extends MessageChild {
 	authorId: string;
-	children: string[];
 	connection: string;
+	children: MessageChild[];
+	reference?: string;
 }
