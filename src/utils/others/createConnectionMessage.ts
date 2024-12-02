@@ -7,6 +7,8 @@ import {
 import type { MessageChild, ReferenceMessage } from '@/types/messages';
 import type { Guild, Message, User } from 'seyfert';
 import { MessageReferenceType } from 'seyfert/lib/types';
+import { formatContent } from '../common/formatContent';
+import { createConnectionMessageEmbed } from '../ui/embeds/createConnectionMessageEmbed';
 
 interface CreateConnectionMessageOptions {
 	guild: Guild;
@@ -15,7 +17,7 @@ interface CreateConnectionMessageOptions {
 	children?: MessageChild[];
 	reference?: ReferenceMessage;
 	connection: ConnectedConnection;
-	metadata: { maxChars?: number; cases: GuildCase[] };
+	metadata: { maxChars?: number; cases: GuildCase[]; invite?: string };
 }
 
 export const createConnectionMessage = async ({
@@ -25,7 +27,7 @@ export const createConnectionMessage = async ({
 	reference,
 	connection,
 	repostUser,
-	metadata: { cases },
+	metadata: { cases, invite },
 }: CreateConnectionMessageOptions) => {
 	const connectionChannel = await guild.channels.fetch(connection.channelId);
 
@@ -46,7 +48,6 @@ export const createConnectionMessage = async ({
 		if (userCase.type === CaseType.Timeout && userCase.lifetime >= Date.now())
 			return;
 
-		// TODO: Make the request after the message
 		await guilds.updateOne(
 			{ id: guild.id },
 			{
@@ -58,18 +59,27 @@ export const createConnectionMessage = async ({
 	const isMention =
 		reference?.author.allowMentions &&
 		reference.data.channelId === connectionChannel.id;
-	const { id } = await message.client.messages.write(connection.channelId, {
+
+	const { id } = await message.write({
 		message_reference: isMention
 			? {
 					message_id: reference.message.id,
 					type: repostUser && MessageReferenceType.Forward,
 				}
 			: void 0,
-		content: `<@${authorId}>:\n\n${message.content}`,
 		allowed_mentions: {
 			parse: [],
 			replied_user: true,
 		},
+		embeds: [
+			createConnectionMessageEmbed({
+				guild,
+				invite,
+				message,
+				reference,
+				data: formatContent({ message, connection }),
+			}),
+		],
 	});
 
 	if (children)

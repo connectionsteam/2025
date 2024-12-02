@@ -1,3 +1,4 @@
 export const Constants = {
-	InvisibleColor: '#2b2d31',
+	InvisibleColor: 2829617,
+	ReplyPattern: /^.+\n-# Replying to .+\n\n(.+)/,
 };

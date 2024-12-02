@@ -1,13 +1,20 @@
 import { connections } from '@/models/connection.model';
+import { guilds } from '@/models/guild.model';
 import { ConnectionType } from '@/types/connection';
 import {
 	ActionRow,
 	type Button,
 	type CommandContext,
+	createChannelOption,
 	createIntegerOption,
 } from 'seyfert';
 import { Declare, Options, SubCommand, createStringOption } from 'seyfert';
-import { ButtonStyle, ComponentType, MessageFlags } from 'seyfert/lib/types';
+import {
+	ButtonStyle,
+	ChannelType,
+	ComponentType,
+	MessageFlags,
+} from 'seyfert/lib/types';
 
 const options = {
 	name: createStringOption({
@@ -52,6 +59,10 @@ const options = {
 			},
 		],
 	}),
+	channel: createChannelOption({
+		description: 'Enter the channel @mention to connect the connection',
+		channel_types: [ChannelType.GuildText],
+	}),
 };
 
 @Declare({
@@ -88,7 +99,7 @@ export class CreateConnectionSubcommand extends SubCommand {
 				flags: MessageFlags.Ephemeral,
 			});
 
-		await Promise.all([
+		const promises = [
 			connections.create({
 				name,
 				type: context.options.type,
@@ -118,6 +129,20 @@ export class CreateConnectionSubcommand extends SubCommand {
 					}),
 				],
 			}),
-		]);
+		] as Promise<unknown>[];
+
+		const { channel } = context.options;
+
+		if (channel)
+			promises.push(
+				guilds.updateOne(
+					{
+						id: context.guildId,
+					},
+					{ $push: { connections: { name, channelId: channel.id, flags: 0 } } },
+				),
+			);
+
+		await Promise.all(promises);
 	}
 }
