@@ -1,3 +1,4 @@
+import { handleCreateConnectionMessage } from '@/handlers/utils/handleCreateConnectionMessage';
 import { fetchGuild } from '@/utils/common/fetchGuild';
 import { fetchUser } from '@/utils/common/fetchUser';
 import { createEvent } from 'seyfert';
@@ -41,5 +42,12 @@ export default createEvent({
 		);
 
 		if (!connection) return;
+
+		await handleCreateConnectionMessage({
+			guild,
+			channel,
+			message,
+			connection,
+		});
 	},
 });

@@ -3,6 +3,7 @@ import {
 	Command,
 	type CommandContext,
 	Declare,
+	IgnoreCommand,
 	Middlewares,
 	Options,
 	createBooleanOption,
@@ -10,7 +11,6 @@ import {
 } from 'seyfert';
 import { MessageFlags } from 'seyfert/lib/types';
 
-const DEV_GUILD_ID = '1243234751200890920';
 const options = {
 	code: createStringOption({
 		required: true,
@@ -23,8 +23,8 @@ const options = {
 
 @Declare({
 	name: 'eval',
-	guildId: [DEV_GUILD_ID],
 	description: 'Evaluate a code with Connections',
+	ignore: IgnoreCommand.Slash,
 })
 @Options(options)
 @Middlewares(['dev'])

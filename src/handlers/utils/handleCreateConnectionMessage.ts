@@ -5,15 +5,18 @@ import { ConnectionType } from '@/types/connection';
 import type { HandleCreateConnectionMessageOptions } from '@/types/handlers';
 import type { MessageChild } from '@/types/messages';
 import { createConnectionMessage } from '@/utils/others/createConnectionMessage';
+import { executeWithBatches } from '@/utils/others/executeWithBatches';
+import { fetchReference } from '@/utils/others/fetchReference';
 import { isNewAccount } from '@/utils/utility/isNewAccount';
+import { ActionRow, type Button } from 'seyfert';
+import { ButtonStyle, ComponentType } from 'seyfert/lib/types';
 
 export const handleCreateConnectionMessage = async ({
-	user,
 	guild,
 	channel,
 	message,
+	repostUser,
 	connection,
-	fetchedGuild,
 }: HandleCreateConnectionMessageOptions) => {
 	if (isNewAccount(message.author.createdTimestamp)) return;
 
@@ -24,21 +27,42 @@ export const handleCreateConnectionMessage = async ({
 	);
 
 	if (!fetchedConnection) {
-		await message.reply({
-			content: 'essa conexao nao existe, sla o pq',
-		});
-
-		await guilds.updateMany(
-			{
-				'connections.name': connection.name,
-			},
-			{
-				$pull: {
-					connections: { name: connection.name },
-					cases: { connection: connection.name },
+		const promises = [
+			message.reply({
+				content: `Connection **${connection.name}** appears to no longer exist. Sorry for the confusion.`,
+				components: [
+					new ActionRow<Button>({
+						components: [
+							{
+								label: 'Why?',
+								style: ButtonStyle.Link,
+								type: ComponentType.Button,
+								// TODO: Put the corret link here
+								url: 'https://connections.docs/why-connection-does-not-exist',
+							},
+						],
+					}),
+				],
+			}),
+			guilds.updateMany(
+				{
+					'connections.name': connection.name,
 				},
-			},
-		);
+				{
+					$pull: {
+						connections: { name: connection.name },
+						cases: { connection: connection.name },
+					},
+				},
+			),
+			messages.deleteMany({
+				connection: connection.name,
+			}),
+		];
+
+		Promise;
+
+		await Promise.allSettled(promises);
 
 		return;
 	}
@@ -47,10 +71,10 @@ export const handleCreateConnectionMessage = async ({
 	if (fetchedConnection.pausedAt) return;
 	if (fetchedConnection.type && !channel.nsfw)
 		return message.reply({
-			content: 'esse canal precisa ser nsfw por conta da conexão',
+			content: `Connection **${connection.name}** is NSFW or Anonymous and the channel need to be NSFW.`,
 		});
 
-	// TODO: Cooldown here
+	// TODO: Implementar coolodown aqui
 
 	const connectedConnections = await guilds.find(
 		{
@@ -75,10 +99,21 @@ export const handleCreateConnectionMessage = async ({
 		fetchedConnection.type !== ConnectionType.Anonymous
 			? ([] as MessageChild[])
 			: void 0;
+	const reference = message.referencedMessage
+		? await fetchReference(message)
+		: void 0;
 
-	for (const crrGuild of connectedConnections) {
-		await createConnectionMessage();
-	}
+	await executeWithBatches(async ({ cases = [], metadata }) => {
+		await createConnectionMessage({
+			guild,
+			message,
+			children,
+			reference,
+			connection,
+			repostUser,
+			metadata: { maxChars: metadata?.maxChars, cases },
+		});
+	}, connectedConnections);
 
 	if (children)
 		await messages.create({
@@ -87,5 +122,6 @@ export const handleCreateConnectionMessage = async ({
 			channelId: channel.id,
 			authorId: message.author.id,
 			connection: connection.name,
+			reference: reference?.data.id,
 		});
 };

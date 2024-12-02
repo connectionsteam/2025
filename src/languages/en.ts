@@ -11,7 +11,7 @@ export default {
 	unknownMessage: 'We could not find this message...',
 	cannotRepostOwnMessage: 'You can not repost you own message.',
 	messageReposted(url: string) {
-		return `<:repost:1312857720168382567> You just reposted ${url}.`
+		return `<:repost:1312857720168382567> You just reposted ${url}.`;
 	},
 	//#endregion
 };

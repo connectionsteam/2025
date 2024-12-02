@@ -1,24 +1,24 @@
 import { Client } from 'seyfert';
 import { middlewares } from './middlewares/middlewares';
 
-const client = new Client();
+const client = new Client({});
 
 client.setServices({
 	middlewares,
 	cache: {
 		disabledCache: {
-			bans: false,
-			emojis: false,
-			members: false,
-			messages: false,
-			overwrites: false,
-			presences: false,
-			roles: false,
-			stageInstances: false,
-			stickers: false,
-			voiceStates: false,
+			bans: true,
+			emojis: true,
+			members: true,
+			//messages: true,
+			overwrites: true,
+			presences: true,
+			roles: true,
+			stageInstances: true,
+			stickers: true,
+			voiceStates: true,
 		},
 	},
 });
 
-client.start().then(() => client.uploadCommands);
+client.start().then(() => client.uploadCommands());

@@ -18,8 +18,7 @@ const options = {
 
 			const topConnections = await connections.aggregate([
 				{
-					$match:
-						isEmpty ? {} : { name: { $regex: name, $options: 'i' } },
+					$match: isEmpty ? {} : { name: { $regex: name, $options: 'i' } },
 				},
 				{
 					$project: {

@@ -11,7 +11,9 @@ const guildSchema = new Schema<Guild>({
 		type: [
 			{
 				id: String,
-				type: Number,
+				type: {
+					type: Number,
+				},
 			},
 		],
 	},

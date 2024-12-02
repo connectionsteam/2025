@@ -1,12 +1,10 @@
-import type { Guild as DGuild, Message, TextGuildChannel } from 'seyfert';
-import type { ConnectedConnection, Guild } from './guild';
-import type { User } from './user';
+import type { Guild, Message, TextGuildChannel, User } from 'seyfert';
+import type { ConnectedConnection } from './guild';
 
 export interface HandleCreateConnectionMessageOptions {
-	user: User;
-	guild: DGuild;
+	guild: Guild;
 	message: Message;
-	fetchedGuild: Guild;
+	repostUser?: User;
 	channel: TextGuildChannel;
 	connection: ConnectedConnection;
 }
