@@ -1,23 +1,25 @@
-import { connections } from '@/models/connection.model';
 import { connect } from 'mongoose';
 import { createEvent } from 'seyfert';
 import { ActivityType, PresenceUpdateStatus } from 'seyfert/lib/types';
 
 export default createEvent({
 	data: { name: 'botReady', once: true },
-	async run(user, client) {
+	async run(_, client) {
 		await connect(process.env.MONGOOSE_URL as string);
 
 		client.logger.debug('Database connected successfully');
 
-		const connectionsCount = await connections.countDocuments();
-
 		client.gateway.setPresence({
 			activities: [
 				{
-					name: '',
+					name: 'a',
 					type: ActivityType.Custom,
-					state: `${connectionsCount} amazing connections to discover 🤍`,
+					state: `🤍 ${client.cache.users?.count()} users talking`,
+				},
+				{
+					name: 'b',
+					type: ActivityType.Custom,
+					state: `🤍 ${client.cache.guilds?.count()} guilds out there`,
 				},
 			],
 			afk: false,
