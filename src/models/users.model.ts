@@ -60,6 +60,13 @@ const userSchema = new Schema<User>(
 			default: [],
 		},
 		ttmCount: Number,
+		premium: {
+			type: {
+				type: Number,
+			},
+			expiresAt: Number,
+			members: [String],
+		},
 	},
 	{ versionKey: false },
 );

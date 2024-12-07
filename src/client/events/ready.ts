@@ -5,7 +5,7 @@ import { ActivityType, PresenceUpdateStatus } from 'seyfert/lib/types';
 export default createEvent({
 	data: { name: 'botReady', once: true },
 	async run(_, client) {
-		await connect(process.env.MONGOOSE_URL as string);
+		await connect(process.env.DATABASE_URL as string);
 
 		client.logger.debug('Database connected successfully');
 
@@ -13,11 +13,6 @@ export default createEvent({
 			activities: [
 				{
 					name: 'a',
-					type: ActivityType.Custom,
-					state: `🤍 ${client.cache.users?.count()} users talking`,
-				},
-				{
-					name: 'b',
 					type: ActivityType.Custom,
 					state: `🤍 ${client.cache.guilds?.count()} guilds out there`,
 				},

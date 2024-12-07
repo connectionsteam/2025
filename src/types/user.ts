@@ -18,7 +18,20 @@ export interface User {
 	 * Trending Top Messages counter
 	 */
 	ttmCount?: number;
+	premium?: UserPremium;
 }
+
+export enum UserPremiumType {
+	Plus = 1,
+	Gang = 2,
+}
+
+type UserPremium =
+	| {
+			type: UserPremiumType.Plus;
+			expiresAt: number;
+	  }
+	| { type: UserPremiumType.Gang; expiresAt: number; members: string[] };
 
 export interface Achievement {
 	unlockedAt: number;
