@@ -1,12 +1,13 @@
 import { guilds } from '@/models/guild.model';
 import {
 	CaseType,
+	ConnectedConnectionFlags,
 	type ConnectedConnection,
 	type GuildCase,
 } from '@/types/guild';
 import type { MessageChild, ReferenceMessage } from '@/types/messages';
 import type { Guild, Message, User } from 'seyfert';
-import { MessageReferenceType } from 'seyfert/lib/types';
+import { AllowedMentionsTypes, MessageReferenceType } from 'seyfert/lib/types';
 import { formatContent } from '../common/formatContent';
 import { createConnectionMessageEmbed } from '../ui/embeds/createConnectionMessageEmbed';
 
@@ -68,8 +69,8 @@ export const createConnectionMessage = async ({
 				}
 			: void 0,
 		allowed_mentions: {
-			parse: [],
 			replied_user: true,
+			parse: connection.flags & ConnectedConnectionFlags.AllowMentions ? [AllowedMentionsTypes.User] : void 0,
 		},
 		embeds: [
 			createConnectionMessageEmbed({
@@ -77,6 +78,7 @@ export const createConnectionMessage = async ({
 				invite,
 				message,
 				reference,
+				flags: connection.flags,
 				data: formatContent({ message, connection }),
 			}),
 		],

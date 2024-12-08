@@ -20,20 +20,23 @@ export interface ConnectedConnection {
 }
 
 export enum ConnectedConnectionFlags {
+	/**
+	 * @deprecated "Frozen" flag is deprecated
+	 */
 	Frozen = 1 << 1,
-	AllowFiles = 1 << 2,
-	AllowInvites = 1 << 3,
-	AllowLinks = 1 << 4,
+	AllowFiles = 1 << 2, // Ok
+	AllowInvites = 1 << 3, // Ok
+	AllowLinks = 1 << 4, // Ok
 	NoIndentification = 1 << 5,
-	AllowOrigin = 1 << 6,
+	AllowOrigin = 1 << 6, // Ok
 	AllowWebhooks = 1 << 7,
-	AllowEmojis = 1 << 8,
-	CompactModeEnabled = 1 << 9,
+	AllowEmojis = 1 << 8, // Ok
+	CompactMode = 1 << 9,
 	ConfirmActions = 1 << 10,
 	AutoTranslate = 1 << 11,
 	Inactive = 1 << 12,
-	AllowMentions = 1 << 13,
-	AllowWallOfText = 1 << 14,
+	AllowMentions = 1 << 13, // Ok
+	AllowWallOfText = 1 << 14, // Ok
 }
 
 export interface GuildPremium {
