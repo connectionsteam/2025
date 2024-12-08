@@ -3,6 +3,7 @@ import { guilds } from '@/models/guild.model';
 import { ConnectedConnectionFlags } from '@/types/guild';
 import {
 	type CommandContext,
+	type DefaultLocale,
 	Middlewares,
 	createChannelOption,
 	createStringOption,
@@ -36,9 +37,7 @@ export class JoinConnectionSubcommand extends SubCommand {
 
 		if (guildConnections.length === GUILD_CONNECTIONS_LIMIT)
 			return context.editOrReply({
-				// TODO: Mensagem melhor e premium
-				content:
-					'Unfortunatelly this server has reached the limit of connections.',
+				...responses.guildReachedConnectionsLimit,
 				flags: MessageFlags.Ephemeral,
 			});
 
@@ -51,7 +50,7 @@ export class JoinConnectionSubcommand extends SubCommand {
 
 		if (isConnectionAlreadyConnected)
 			return context.editOrReply({
-				content: `Connection **${name}** is already connected in this guild.`,
+				...responses.connectionIsAlreadyConnected(name),
 				flags: MessageFlags.Ephemeral,
 			});
 
@@ -63,6 +62,7 @@ export class JoinConnectionSubcommand extends SubCommand {
 				type: true,
 				creatorId: true,
 				metadata: true,
+				promotingSince: true,
 			},
 			{ lean: true },
 		);
@@ -76,13 +76,20 @@ export class JoinConnectionSubcommand extends SubCommand {
 		const connectedGuildsCount = await guilds.countDocuments({
 			'connections.name': name,
 		});
+		const MAX_CONNECTED_GUILDS_PER_CONNECTION =
+			originalConnection.promotingSince ? 100 : 50;
 
 		if (
 			connectedGuildsCount ===
-			(originalConnection.metadata?.maxConnections ?? 50)
+			(originalConnection.metadata?.maxConnections ??
+				MAX_CONNECTED_GUILDS_PER_CONNECTION)
 		)
 			return context.editOrReply({
-				content: 'Connection reached the limit of servers to join',
+				...responses.connectionReachedGuildsLimit(
+					name,
+					context.author.id === originalConnection.creatorId,
+					originalConnection.creatorId,
+				),
 				flags: MessageFlags.Ephemeral,
 			});
 
@@ -94,9 +101,9 @@ export class JoinConnectionSubcommand extends SubCommand {
 				{ limit: minMembers },
 			);
 
-			if (members.length !== minMembers)
+			if (members.length <= minMembers)
 				return context.editOrReply({
-					content: `This server must have at least "${minMembers}" to join in this connection`,
+					content: responses.insufficientNumberOfMembers(minMembers),
 					flags: MessageFlags.Ephemeral,
 				});
 		}
@@ -110,30 +117,25 @@ export class JoinConnectionSubcommand extends SubCommand {
 			)
 		)
 			return context.editOrReply({
-				content: `Some connection is already using the channel ${channel}`,
+				content: responses.someConnectionIsUsingTheChannel(channel.id),
 				flags: MessageFlags.Ephemeral,
 			});
 		if (originalConnection.type && !channel.nsfw)
 			return context.editOrReply({
-				content: `Channel ${channel} must be NSFW`,
+				...responses.channelMustBeNSFW(channel.id),
 				flags: MessageFlags.Ephemeral,
 			});
 
-		// TODO: Implementar regras
-		/* const rules = connection.metadata?.rules;
+		const rules = originalConnection.metadata?.rules;
 
-    if (
-        rules &&
-        context.author.id !== originalConnection.creatorId
-    )
-        return handleAcceptConnectionRules({
-            guild,
-            channel,
-            responses,
-            interaction,
-            connection: name,
-            rules: originalConnection.rules,
-        }); */
+		if (rules && context.author.id !== originalConnection.creatorId)
+			return this.accepConnectionRules({
+				name,
+				rules,
+				context,
+				responses,
+				channelId: channel.id,
+			});
 
 		const connection = {
 			name,
@@ -150,41 +152,65 @@ export class JoinConnectionSubcommand extends SubCommand {
 				},
 				{ $push: { connections: connection } },
 			),
-			context.editOrReply({
-				content: `Connection **${name}** has been connected`,
-			}),
+			context.editOrReply(responses.connectionConnected(name, channel.id)),
 		]);
 
 		await context.interaction.followup({
-			content: 'Rules complement',
+			...responses.connectionConnectedFollowUp,
 			flags: MessageFlags.Ephemeral,
 		});
+	}
 
-		/* if (
-        guild.logs.channelId &&
-        hasLogFlag(guild.logs.flags, LogsFlag.LogConnections)
-    )
-        await createConnectionLog({
-            connection,
-            channelId: guild.logs.channelId,
-            type: ConnectionLogType.Joined,
-            embed: responses.connectionLogEmbed({
-                connection,
-                type: ConnectionLogType.Joined,
-                channelId: guild.logs.channelId,
-            }),
-        });
+	async accepConnectionRules({
+		name,
+		rules,
+		channelId,
+		context,
+		responses,
+	}: {
+		context: CommandContext;
+		rules: string;
+		name: string;
+		responses: DefaultLocale;
+		channelId: string;
+	}) {
+		const message = await context.write(
+			responses.acceptConnectionRules(rules),
+			true,
+		);
 
-    const { webhook, new: isNew } = await fetchConnectionWebhook(channel);
+		message
+			.createComponentCollector({
+				filter: (i) => i.user.id === context.author.id,
+			})
+			.run('accept-rules', async (i) => {
+				if (i.customId === 'reject') {
+					await i.write({
+						content: responses.rulesRejected,
+						flags: MessageFlags.Ephemeral,
+					});
+					await message.delete();
 
-    if (isNew)
-        await guilds.updateOne(
-            {
-                guildId: guild.guildId,
-                'connections.$.name': name,
-            },
-            { 'connections.$.webhookURL': webhook.url }
-        );
-    } */
+					return;
+				}
+
+				const connection = {
+					name,
+					channelId,
+					flags:
+						ConnectedConnectionFlags.AllowEmojis |
+						ConnectedConnectionFlags.AllowOrigin,
+				};
+
+				await Promise.allSettled([
+					guilds.updateOne(
+						{
+							id: context.guildId,
+						},
+						{ $push: { connections: connection } },
+					),
+					context.editOrReply(responses.connectionConnected(name, channelId)),
+				]);
+			});
 	}
 }

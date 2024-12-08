@@ -14,7 +14,7 @@ export default createEvent({
 				`🤍 ${client.cache.guilds?.count()} guilds out there`,
 				'#2025',
 				`🤍 Connecting ${client.cache.users?.count()} users`,
-				'connections.squareweb.app'
+				'connections.squareweb.app',
 			];
 
 			client.gateway.setPresence({

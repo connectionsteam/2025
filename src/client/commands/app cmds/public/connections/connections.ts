@@ -4,9 +4,9 @@ import { JoinConnectionSubcommand } from './join.command';
 
 @Declare({
 	name: 'connections',
-	description: 'Connections commands.',
 	contexts: ['Guild'],
 	ignore: IgnoreCommand.Message,
+	description: 'Manage your connections.',
 })
 @Options([CreateConnectionSubcommand, JoinConnectionSubcommand])
 export default class ConnectionsCommand extends Command {}
