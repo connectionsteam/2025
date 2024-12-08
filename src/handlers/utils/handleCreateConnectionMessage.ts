@@ -1,6 +1,7 @@
 import { connections } from '@/models/connection.model';
 import { guilds } from '@/models/guild.model';
 import { messages } from '@/models/messages.model';
+import { users } from '@/models/users.model';
 import { ConnectionType } from '@/types/connection';
 import type { HandleCreateConnectionMessageOptions } from '@/types/handlers';
 import type { MessageChild } from '@/types/messages';
@@ -151,13 +152,25 @@ export const handleCreateConnectionMessage = async ({
 		});
 	}, connectedConnections);
 
+	const xp = new Set(message.content).size / 7;
+	const promises = [
+		users.updateOne(
+			{ id: message.author.id },
+			{ $inc: { xpCount: xp > 3 ? 3 : xp } },
+		),
+	] as Promise<unknown>[];
+
 	if (children)
-		await messages.create({
-			children,
-			id: message.id,
-			connection: name,
-			channelId: channel.id,
-			authorId: message.author.id,
-			reference: reference?.data.id,
-		});
+		promises.push(
+			messages.create({
+				children,
+				id: message.id,
+				connection: name,
+				channelId: channel.id,
+				authorId: message.author.id,
+				reference: reference?.data.id,
+			}),
+		);
+
+	await Promise.allSettled(promises);
 };

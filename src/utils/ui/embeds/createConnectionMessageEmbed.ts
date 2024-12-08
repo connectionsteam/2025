@@ -28,10 +28,13 @@ export const createConnectionMessageEmbed = ({
 			icon_url: message.author.defaultAvatarURL(),
 		},
 		color: Constants.InvisibleColor,
-		footer: flags & ConnectedConnectionFlags.AllowOrigin ? {
-			text: `${guild.name}${invite ? ` | ${invite}` : ''}`,
-			icon_url: guild.iconURL(),
-		} : undefined,
+		footer:
+			flags & ConnectedConnectionFlags.AllowOrigin
+				? {
+						text: `${guild.name}${invite ? ` | ${invite}` : ''}`,
+						icon_url: guild.iconURL(),
+					}
+				: undefined,
 		image: attachment && { url: attachment },
 		description: reference
 			? `${getContent(reference.message)}\n-# Replying to ${reference.author}\n\n${content}`

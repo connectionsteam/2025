@@ -19,6 +19,7 @@ export interface User {
 	 */
 	ttmCount?: number;
 	premium?: UserPremium;
+	xpCount?: number;
 }
 
 export enum UserPremiumType {

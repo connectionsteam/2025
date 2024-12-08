@@ -67,6 +67,7 @@ const userSchema = new Schema<User>(
 			expiresAt: Number,
 			members: [String],
 		},
+		xpCount: Number,
 	},
 	{ versionKey: false },
 );

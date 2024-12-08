@@ -1,8 +1,8 @@
 import { guilds } from '@/models/guild.model';
 import {
 	CaseType,
-	ConnectedConnectionFlags,
 	type ConnectedConnection,
+	ConnectedConnectionFlags,
 	type GuildCase,
 } from '@/types/guild';
 import type { MessageChild, ReferenceMessage } from '@/types/messages';
@@ -70,7 +70,10 @@ export const createConnectionMessage = async ({
 			: void 0,
 		allowed_mentions: {
 			replied_user: true,
-			parse: connection.flags & ConnectedConnectionFlags.AllowMentions ? [AllowedMentionsTypes.User] : void 0,
+			parse:
+				connection.flags & ConnectedConnectionFlags.AllowMentions
+					? [AllowedMentionsTypes.User]
+					: void 0,
 		},
 		embeds: [
 			createConnectionMessageEmbed({
