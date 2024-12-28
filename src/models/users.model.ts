@@ -69,6 +69,7 @@ const userSchema = new Schema<User>(
 			members: [String],
 		},
 		xpCount: Number,
+		boosts: Number,
 	},
 	{ versionKey: false },
 );

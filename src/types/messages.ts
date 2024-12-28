@@ -9,8 +9,9 @@ export interface MessageChild {
 export interface ConnectionMessage extends MessageChild {
 	authorId: string;
 	connection: string;
-	children: MessageChild[];
 	reference?: string;
+	boostCount?: number;
+	children: MessageChild[];
 }
 
 export interface ReferenceMessage {

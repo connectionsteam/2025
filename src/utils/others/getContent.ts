@@ -7,5 +7,7 @@ export const getContent = ({
 }: { content?: string; embeds: APIEmbed[] }) => {
 	if (content) return content;
 
-	return embed.description?.match(Constants.ReplyPattern)?.[1] ?? embed.description;
+	return (
+		embed.description?.match(Constants.ReplyPattern)?.[1] ?? embed.description
+	);
 };

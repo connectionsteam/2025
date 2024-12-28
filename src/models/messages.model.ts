@@ -25,6 +25,7 @@ const messageSchema = new Schema<ConnectionMessage>(
 			required: true,
 		},
 		reference: String,
+		boostCount: Number,
 	},
 	{ versionKey: false },
 ).index({ 'children.id': 1, channelId: 1 });

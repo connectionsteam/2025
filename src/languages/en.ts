@@ -78,9 +78,12 @@ export default {
 	messageReposted(url: string) {
 		return `<:repost:1312857720168382567> You just reposted ${url}.`;
 	},
+	messageBoosted(crrBoosts: number, url: string) {
+		return `✨ You just boosted ${url}! Now this message has **${crrBoosts}** boosts!`;
+	},
 	//#endregion
 
-	//#region Guild
+	//#region Guilds
 	guildReachedConnectionsLimit: {
 		content:
 			'Unfortunatelly this server has reached the limit of connections. Buy [Connections For Guilds](https://connections.squareweb.app/premum)!',
@@ -159,4 +162,24 @@ export default {
 		],
 	},
 	// #endregion
+	//#region Users
+	userDoesntHaveBoosts: {
+		content: 'You do not have any boost yet. You can buy them in the website!',
+		components: [
+			new ActionRow<Button>({
+				components: [
+					{
+						emoji: {
+							name: '✨',
+						},
+						label: 'Go to Website',
+						style: ButtonStyle.Link,
+						type: ComponentType.Button,
+						url: 'https://connections.squareweb.app/boosts',
+					},
+				],
+			}),
+		],
+	},
+	//#endregion
 };
