@@ -10,7 +10,6 @@ client.setServices({
 			bans: true,
 			emojis: true,
 			members: true,
-			//messages: true,
 			overwrites: true,
 			presences: true,
 			roles: true,

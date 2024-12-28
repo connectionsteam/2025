@@ -6,6 +6,7 @@ const userSchema = new Schema<User>(
 		id: {
 			type: String,
 			unique: true,
+			required: true,
 		},
 		allowMentions: {
 			type: Boolean,

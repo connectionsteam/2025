@@ -12,7 +12,7 @@ import { ButtonStyle, ComponentType } from 'seyfert/lib/types';
 
 @Declare({
 	name: 'premium',
-	dscription: 'See premium status of any user',
+	dscription: 'See your premium status',
 	contexts: ['Guild'],
 	props: {
 		projection: {

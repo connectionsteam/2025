@@ -21,6 +21,7 @@ interface CreateConnectionMessageOptions {
 	metadata: { maxChars?: number; cases: GuildCase[]; invite?: string };
 }
 
+// TODO: Não está funcionando, precisa arrumar uns negócios no handleMessage alguma coisa
 export const createConnectionMessage = async ({
 	guild,
 	message,

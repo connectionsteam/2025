@@ -1,6 +1,6 @@
 {
-	"name": "connections-2025",
-	"description": "Connections for 2025",
+	"name": "2025",
+	"description": "Customize the way you talk, be better. But now open-source 💜.",
 	"module": "src/index.ts",
 	"type": "module",
 	"scripts": {
@@ -10,11 +10,11 @@
 		"app": "bun run src/index.ts"
 	},
 	"devDependencies": {
-		"@types/bun": "latest"
+		"@types/bun": "latest",
+		"@types/ms": "^0.7.34"
 	},
 	"dependencies": {
 		"@biomejs/biome": "^1.9.4",
-		"@types/ms": "^0.7.34",
 		"bing-translate-api": "^4.0.2",
 		"cron": "^3.1.7",
 		"mongoose": "^8.8.4",

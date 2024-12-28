@@ -6,6 +6,7 @@ const guildSchema = new Schema<Guild>(
 		id: {
 			type: String,
 			unique: true,
+			required: true,
 		},
 		prefix: String,
 		mods: {

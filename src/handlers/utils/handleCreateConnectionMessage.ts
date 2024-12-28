@@ -11,6 +11,7 @@ import { fetchReference } from '@/utils/others/fetchReference';
 import { ActionRow, type Button } from 'seyfert';
 import { ButtonStyle, ComponentType } from 'seyfert/lib/types';
 
+// TODO: Not working rn, ill fix later
 export const handleCreateConnectionMessage = async ({
 	guild,
 	channel,

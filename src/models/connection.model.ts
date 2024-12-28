@@ -6,6 +6,7 @@ const connectionSchema = new Schema<Connection>(
 		name: {
 			type: String,
 			unique: true,
+			required: true,
 		},
 		icon: String,
 		teamId: String,
