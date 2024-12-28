@@ -1,4 +1,5 @@
 import { handleCreateConnectionMessage } from '@/handlers/utils/handleCreateConnectionMessage';
+import { handleCreateThreadMessage } from '@/handlers/utils/handleCreateThreadMessage';
 import { fetchGuild } from '@/utils/common/fetchGuild';
 import { fetchUser } from '@/utils/common/fetchUser';
 import { createEvent } from 'seyfert';
@@ -35,7 +36,12 @@ export default createEvent({
 			projection: 'connections',
 		});
 
-		if (channel.isThread()) return;
+		if (channel.isThread())
+			return handleCreateThreadMessage({
+				message,
+				thread: channel,
+				guild: fetchedGuild,
+			});
 
 		const connection = fetchedGuild.connections?.find(
 			(connection) => connection.channelId === message.channelId,

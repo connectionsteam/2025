@@ -6,6 +6,7 @@ export interface Guild {
 	premium?: GuildPremium;
 	metadata?: GuildMetadata;
 	connections?: ConnectedConnection[];
+	threads?: { id: string; parent: string }[];
 }
 
 export interface ConnectedConnection {

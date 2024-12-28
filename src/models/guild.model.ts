@@ -65,6 +65,9 @@ const guildSchema = new Schema<Guild>(
 				lifetime: Number,
 			},
 		],
+		threads: {
+			type: [Object],
+		},
 	},
 	{ versionKey: false },
 );
