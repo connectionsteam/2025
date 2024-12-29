@@ -23,14 +23,15 @@ const options = {
 
 @Declare({
 	name: 'eval',
-	description: 'Evaluate a code with Connections',
 	ignore: IgnoreCommand.Slash,
+	description: 'Evaluate a code with Connections',
 })
 @Options(options)
 @Middlewares(['dev'])
 export default class EvalCommand extends Command {
 	async run(context: CommandContext<typeof options>) {
 		const { code, hide } = context.options;
+		// biome-ignore lint/security/noGlobalEval: <explanation>
 		const result = eval(code);
 
 		if (result instanceof Promise) await result;

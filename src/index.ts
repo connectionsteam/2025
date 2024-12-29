@@ -1,7 +1,11 @@
 import { Client } from 'seyfert';
 import { middlewares } from './middlewares/middlewares';
 
-const client = new Client();
+const client = new Client({
+	commands: {
+		prefix: () => ['c.'],
+	},
+});
 
 client.setServices({
 	middlewares,

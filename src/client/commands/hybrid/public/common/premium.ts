@@ -12,13 +12,13 @@ import { ButtonStyle, ComponentType } from 'seyfert/lib/types';
 
 @Declare({
 	name: 'premium',
-	dscription: 'See your premium status',
 	contexts: ['Guild'],
 	props: {
 		projection: {
 			user: 'premium',
 		},
 	},
+	description: 'See your premium status',
 })
 @Middlewares(['user'])
 export default class PremiumCommand extends Command {

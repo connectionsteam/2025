@@ -23,7 +23,7 @@ import {
 		projection: { user: 'bookmarks' },
 	},
 })
-@Middlewares(['user'])
+@Middlewares(['nop', 'user'])
 export default class BookmarkCommand extends Command {
 	async run(ctx: CommandContext<never, 'user'>) {
 		if (!ctx.isMenuMessage()) return;

@@ -26,6 +26,9 @@ const messageSchema = new Schema<ConnectionMessage>(
 		},
 		reference: String,
 		boostCount: Number,
+		likes: {
+			type: [String],
+		},
 	},
 	{ versionKey: false },
 ).index({ 'children.id': 1, channelId: 1 });

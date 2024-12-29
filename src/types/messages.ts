@@ -8,6 +8,7 @@ export interface MessageChild {
 
 export interface ConnectionMessage extends MessageChild {
 	authorId: string;
+	likes?: string[];
 	connection: string;
 	reference?: string;
 	boostCount?: number;

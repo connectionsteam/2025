@@ -81,6 +81,12 @@ export default {
 	messageBoosted(crrBoosts: number, url: string) {
 		return `✨ You just boosted ${url}! Now this message has **${crrBoosts}** boosts!`;
 	},
+	userUnlikedMessage(message: string) {
+		return `You unliked the message ${message}.`;
+	},
+	userLikedMessage(message: string, likeCount: number) {
+		return `You just liked the message ${message}! Now it has **${likeCount}** likes!`;
+	},
 	//#endregion
 
 	//#region Guilds
