@@ -20,6 +20,7 @@ client.setServices({
 			stageInstances: true,
 			stickers: true,
 			voiceStates: true,
+			onPacket: true,
 		},
 	},
 });
