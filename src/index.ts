@@ -1,10 +1,23 @@
 import { Client } from 'seyfert';
+import { ActivityType, PresenceUpdateStatus } from 'seyfert/lib/types';
 import { middlewares } from './middlewares/middlewares';
 
 const client = new Client({
 	commands: {
 		prefix: () => ['c.'],
 	},
+	presence: () => ({
+		afk: false,
+		since: null,
+		status: PresenceUpdateStatus.Online,
+		activities: [
+			{
+				name: '.',
+				state: '#2025',
+				type: ActivityType.Custom,
+			},
+		],
+	}),
 });
 
 client.setServices({
@@ -21,6 +34,7 @@ client.setServices({
 			stickers: true,
 			voiceStates: true,
 			onPacket: true,
+			messages: true,
 		},
 	},
 });
