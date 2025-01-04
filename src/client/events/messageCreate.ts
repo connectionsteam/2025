@@ -13,18 +13,17 @@ export default createEvent({
 
 		if (!channel.isTextGuild() && !channel.isThread()) return;
 
-		if (message.content === `<@${message.client.me.id}>`)
-			return message.reply({
-				content: 'Hi',
-				allowed_mentions: { parse: [] },
-			});
-
 		const user = await fetchUser(message.author.id, {
 			blacklist: true,
 			notifications: true,
 		});
 
 		if (user.blacklist) return;
+		if (message.content === `<@${message.client.me.id}>`)
+			return message.reply({
+				allowed_mentions: { parse: [] },
+				content: '**Discover Connections**\n[connections.squareweb.app](https://connections.squareweb.app)\n\n**Our Assistance**\nhttps://discord.gg/RXBRraTWeY',
+			});
 
 		const guild = await message.guild();
 
