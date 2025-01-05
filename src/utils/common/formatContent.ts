@@ -3,7 +3,6 @@ import {
 	ConnectedConnectionFlags,
 } from '@/types/guild';
 import type { Message } from 'seyfert';
-import { StickerFormatType } from 'seyfert/lib/types';
 import urlRegex from 'url-regex';
 import { isImageOrVideo } from '../others/isImageOrVideo';
 
@@ -14,7 +13,7 @@ interface FormatContentOptions {
 
 export const formatContent = ({
 	connection: { flags },
-	message: { content, attachments, stickerItems },
+	message: { content, attachments },
 }: FormatContentOptions) => {
 	const isMissing = (flag: ConnectedConnectionFlags) => !(flags & flag);
 
@@ -31,21 +30,7 @@ export const formatContent = ({
 		content = content.replace(urlRegex({ strict: false }), '');
 	if (isMissing(ConnectedConnectionFlags.AllowFiles)) return { content };
 
-	const rawAttachment =
-		attachments.find(isImageOrVideo) ||
-		stickerItems?.find(
-			(sticker) => sticker.formatType !== StickerFormatType.Lottie,
-		);
-	const attachment = rawAttachment
-		? 'filename' in rawAttachment
-			? rawAttachment.url
-			: `https://cdn.discordapp.com/stickers/${rawAttachment.id}.${rawAttachment.formatType}`
-		: undefined;
-
-	if (!content.length && attachment)
-		return {
-			attachment,
-		};
+	const attachment = attachments.find(isImageOrVideo)?.url;
 
 	return { content, attachment };
 };

@@ -9,10 +9,7 @@ import {
 	createIntegerOption,
 } from 'seyfert';
 import { Declare, Options, SubCommand, createStringOption } from 'seyfert';
-import {
-	ChannelType,
-	MessageFlags,
-} from 'seyfert/lib/types';
+import { ChannelType, MessageFlags } from 'seyfert/lib/types';
 
 const options = {
 	name: createStringOption({
@@ -108,11 +105,17 @@ export class CreateConnectionSubcommand extends SubCommand {
 		if (channel) {
 			// biome-ignore lint/style/noNonNullAssertion: <explanation>
 			const guild = (await context.guild('flow'))!;
-			const fetchedGuild = await fetchGuild({ guild, projection: 'connections' });
-
-			if (fetchedGuild.connections?.some(({channelId})=>channelId===channel.id)) return context.write({
-
+			const fetchedGuild = await fetchGuild({
+				guild,
+				projection: 'connections',
 			});
+
+			if (
+				fetchedGuild.connections?.some(
+					({ channelId }) => channelId === channel.id,
+				)
+			)
+				return context.write({});
 
 			promises.push(
 				guilds.updateOne(

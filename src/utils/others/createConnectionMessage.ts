@@ -10,6 +10,7 @@ import type { Message, Guild as SeyfertGuild, User } from 'seyfert';
 import { AllowedMentionsTypes, MessageReferenceType } from 'seyfert/lib/types';
 import { formatContent } from '../common/formatContent';
 import { createConnectionMessageEmbed } from '../ui/embeds/createConnectionMessageEmbed';
+import { isImageOrVideo } from './isImageOrVideo';
 
 interface CreateConnectionMessageOptions {
 	guild: Guild;

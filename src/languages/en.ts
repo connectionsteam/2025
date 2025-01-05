@@ -71,32 +71,33 @@ export default {
 	rulesRejected:
 		'You have rejected the rules proposed by the connection. The connection was not connected.',
 	invalidConnectionName: 'This name for a connection is not valid.',
-	connectionWithSameNameExists: 'A connection with the same name already exists.',
+	connectionWithSameNameExists:
+		'A connection with the same name already exists.',
 	connectionCreated(name: string) {
 		return {
 			content: `Your connection **${name}** has been created. Make it shine using the buttons bellow!`,
-				components: [
-					new ActionRow<Button>({
-						components: [
-							{
-								label: 'Make it Shine',
-								style: ButtonStyle.Link,
-								type: ComponentType.Button,
-								emoji: {
-									name: '✨',
-								},
-								url: 'https://connections.squareweb.app/promote',
+			components: [
+				new ActionRow<Button>({
+					components: [
+						{
+							label: 'Make it Shine',
+							style: ButtonStyle.Link,
+							type: ComponentType.Button,
+							emoji: {
+								name: '✨',
 							},
-							{
-								style: ButtonStyle.Link,
-								label: "Let's Customize!",
-								type: ComponentType.Button,
-								url: 'https://connections.squareweb.app/dashboard',
-							},
-						],
-					}),
-				],
-		}
+							url: 'https://connections.squareweb.app/promote',
+						},
+						{
+							style: ButtonStyle.Link,
+							label: "Let's Customize!",
+							type: ComponentType.Button,
+							url: 'https://connections.squareweb.app/dashboard',
+						},
+					],
+				}),
+			],
+		};
 	},
 	//#endregion
 

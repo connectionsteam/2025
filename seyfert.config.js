@@ -22,5 +22,5 @@ module.exports = config.bot({
 		events: 'client/events',
 		commands: 'client/commands',
 	},
-	debug: true,
+	//debug: true,
 });

@@ -8,10 +8,7 @@ interface FetchGuildOptions {
 	guild: DiscordGuild<'api' | 'cached'>;
 }
 
-export const fetchGuild = async ({
-	guild,
-	projection,
-}: FetchGuildOptions) => {
+export const fetchGuild = async ({ guild, projection }: FetchGuildOptions) => {
 	return (
 		(await guilds.findOne({ id: guild.id }, projection, { lean: true })) ??
 		(
