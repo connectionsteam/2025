@@ -22,6 +22,6 @@ const threadSchema = new Schema<Thread>(
 		},
 	},
 	{ versionKey: false },
-).index({ creatorId: -1 });
+).index({ creatorId: 1 });
 
 export const threads = model('threads', threadSchema);

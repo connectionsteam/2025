@@ -9,7 +9,6 @@ export const handleCreateThreadMessage = async ({
 	message,
 }: CreateThreadMessageOptions) => {
 	if (!guild.threads?.some(({ id }) => id === thread.id)) return;
-
 	if (
 		!guild.connections?.some(
 			(connection) => connection.channelId === thread.parentId,
@@ -23,7 +22,7 @@ export const handleCreateThreadMessage = async ({
 		{ lean: true },
 	);
 
-	if (!fetchedThread || !fetchedThread.children.length) return;
+	if (!fetchedThread?.children.length) return;
 
 	await executeWithBatches(async (threadId) => {
 		await message.client.messages.write(threadId, {

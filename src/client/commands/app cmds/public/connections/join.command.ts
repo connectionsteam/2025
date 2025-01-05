@@ -1,3 +1,4 @@
+import { default as English } from '@/languages/en';
 import { connections } from '@/models/connection.model';
 import { guilds } from '@/models/guild.model';
 import { ConnectedConnectionFlags } from '@/types/guild';
@@ -33,7 +34,7 @@ export class JoinConnectionSubcommand extends SubCommand {
 		const { guild } = context.metadata;
 		const { connections: guildConnections = [] } = guild;
 		const GUILD_CONNECTIONS_LIMIT = 10;
-		const responses = context.t.get();
+		const responses = English;
 
 		if (guildConnections.length === GUILD_CONNECTIONS_LIMIT)
 			return context.editOrReply({
@@ -42,8 +43,6 @@ export class JoinConnectionSubcommand extends SubCommand {
 			});
 
 		const { name } = context.options;
-
-		// TODO: Fazer para se conectar na mesma conexão até 3 vezes
 		const isConnectionAlreadyConnected = guildConnections.some(
 			(connection) => connection.name === name,
 		);
@@ -164,8 +163,8 @@ export class JoinConnectionSubcommand extends SubCommand {
 	async accepConnectionRules({
 		name,
 		rules,
-		channelId,
 		context,
+		channelId,
 		responses,
 	}: {
 		context: CommandContext;

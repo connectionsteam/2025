@@ -22,7 +22,8 @@ export default createEvent({
 		if (message.content === `<@${message.client.me.id}>`)
 			return message.reply({
 				allowed_mentions: { parse: [] },
-				content: '**Discover Connections**\n[connections.squareweb.app](https://connections.squareweb.app)\n\n**Our Assistance**\nhttps://discord.gg/RXBRraTWeY',
+				content:
+					'**Discover Connections**\n[connections.squareweb.app](https://connections.squareweb.app)\n\n**Our Assistance**\nhttps://discord.gg/RXBRraTWeY',
 			});
 
 		const guild = await message.guild();
@@ -31,7 +32,6 @@ export default createEvent({
 
 		const fetchedGuild = await fetchGuild({
 			guild,
-			id: message.guildId,
 			projection: 'connections',
 		});
 
@@ -49,10 +49,10 @@ export default createEvent({
 		if (!connection) return;
 
 		await handleCreateConnectionMessage({
-			guild,
 			channel,
 			message,
 			connection,
+			originalGuild: guild,
 		});
 	},
 });

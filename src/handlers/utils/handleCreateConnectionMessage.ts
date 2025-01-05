@@ -2,7 +2,6 @@ import { connections } from '@/models/connection.model';
 import { guilds } from '@/models/guild.model';
 import { messages } from '@/models/messages.model';
 import { users } from '@/models/users.model';
-import { ConnectionType } from '@/types/connection';
 import type { HandleCreateConnectionMessageOptions } from '@/types/handlers';
 import type { MessageChild } from '@/types/messages';
 import { createConnectionMessage } from '@/utils/others/createConnectionMessage';
@@ -11,23 +10,24 @@ import { fetchReference } from '@/utils/others/fetchReference';
 import { ActionRow, type Button } from 'seyfert';
 import { ButtonStyle, ComponentType } from 'seyfert/lib/types';
 
-// TODO: Not working rn, ill fix later
 export const handleCreateConnectionMessage = async ({
-	guild,
 	channel,
 	message,
 	repostUser,
 	connection,
+	originalGuild,
 }: HandleCreateConnectionMessageOptions) => {
 	const EIGHT_DAYS_IN_MILLISECONDS = 6.912e8;
-
 	const isNewAccount =
 		message.author.createdTimestamp / 1000 < EIGHT_DAYS_IN_MILLISECONDS;
 
-	if (isNewAccount) return;
+	if (isNewAccount)
+		return message.reply({
+			content:
+				'Your account is too new to send messages in a Connections.\n-# *See why [here](https://connections.squareweb.app/docs)*',
+		});
 
 	const { name } = connection;
-
 	const fetchedConnection = await connections.findOne(
 		{ name },
 		{ type: true, pausedAt: true, promotingSince: true },
@@ -35,7 +35,7 @@ export const handleCreateConnectionMessage = async ({
 	);
 
 	if (!fetchedConnection) {
-		const promises = [
+		await Promise.allSettled([
 			message.reply({
 				content: `Connection **${name}** appears to no longer exist. Sorry for the confusion.`,
 				components: [
@@ -66,24 +66,21 @@ export const handleCreateConnectionMessage = async ({
 			messages.deleteMany({
 				connection: name,
 			}),
-		];
-
-		await Promise.allSettled(promises);
+		]);
 
 		return;
 	}
 
-	const ONE_WEEK_IN_MS = 6.048e8;
-
-	// TODO: Verificar se ta pausado por muito tempo
 	if (fetchedConnection.pausedAt) {
+		const ONE_WEEK_IN_MS = 6.048e8;
+
 		if (
 			!fetchedConnection.promotingSince &&
 			Date.now() - fetchedConnection.pausedAt > ONE_WEEK_IN_MS
 		)
 			await Promise.allSettled([
 				message.write({
-					content: 'This connection has been deleted due to inactivity',
+					content: 'This connection has been deleted due to inactivity.',
 				}),
 				connections.deleteOne({ name }),
 				guilds.updateMany(
@@ -106,72 +103,62 @@ export const handleCreateConnectionMessage = async ({
 	}
 	if (fetchedConnection.type && !channel.nsfw)
 		return message.reply({
-			content: `Connection **${name}** is NSFW or Anonymous and the channel need to be NSFW.`,
+			content: `Current channel need to be NSFW to use the connection **${name}**.`,
 		});
 
-	// TODO: Implementar coolodown aqui
+	// TODO: Implementar cooldown aqui
 
-	const connectedConnections = await guilds
-		.find(
-			{
-				id: { $ne: message.guildId },
-				'connections.name': name,
-				'connections.lockedAt': { $exists: false },
-			},
-			{
-				cases: true,
-				metadata: true,
-				'connections.$': true,
-			},
-			{ lean: true },
-		)
-		.sort({ premium: -1 });
+	const connectedConnections = await guilds.find(
+		{
+			'connections.name': name,
+			id: { $ne: message.guildId },
+			'connections.lockedAt': { $exists: false },
+		},
+		{
+			id: true,
+			cases: true,
+			metadata: true,
+			connections: true,
+		},
+		{ lean: true },
+	);
 
 	if (connectedConnections.length === 0) return;
 
-	const children =
-		fetchedConnection.type !== ConnectionType.Anonymous
-			? ([] as MessageChild[])
-			: void 0;
-	const reference = message.referencedMessage
-		? await fetchReference(message)
-		: void 0;
+	const children = [] as MessageChild[];
+	const reference = await fetchReference(message);
 
-	await executeWithBatches(async ({ cases = [], metadata }) => {
+	await executeWithBatches(async (guild) => {
 		await createConnectionMessage({
+			name,
 			guild,
 			message,
 			children,
 			reference,
-			connection,
 			repostUser,
+			originalGuild,
 			metadata: {
-				maxChars: metadata?.maxChars,
-				cases,
-				invite: metadata?.invite,
+				cases: guild.cases ?? [],
+				invite: guild.metadata?.invite,
+				maxChars: guild.metadata?.maxChars,
 			},
 		});
 	}, connectedConnections);
 
 	const xp = new Set(message.content).size / 7;
-	const promises = [
+
+	await Promise.allSettled([
 		users.updateOne(
 			{ id: message.author.id },
 			{ $inc: { xpCount: xp > 3 ? 3 : xp } },
 		),
-	] as Promise<unknown>[];
-
-	if (children)
-		promises.push(
-			messages.create({
-				children,
-				id: message.id,
-				connection: name,
-				channelId: channel.id,
-				authorId: message.author.id,
-				reference: reference?.data.id,
-			}),
-		);
-
-	await Promise.allSettled(promises);
+		messages.create({
+			children,
+			id: message.id,
+			connection: name,
+			channelId: channel.id,
+			authorId: message.author.id,
+			reference: reference?.data.id,
+		}),
+	]);
 };

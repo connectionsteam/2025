@@ -1,18 +1,16 @@
 import { connections } from '@/models/connection.model';
 import { guilds } from '@/models/guild.model';
 import { ConnectionType } from '@/types/connection';
+import { ConnectedConnectionFlags } from '@/types/guild';
+import { fetchGuild } from '@/utils/common/fetchGuild';
 import {
-	ActionRow,
-	type Button,
 	type CommandContext,
 	createChannelOption,
 	createIntegerOption,
 } from 'seyfert';
 import { Declare, Options, SubCommand, createStringOption } from 'seyfert';
 import {
-	ButtonStyle,
 	ChannelType,
-	ComponentType,
 	MessageFlags,
 } from 'seyfert/lib/types';
 
@@ -53,10 +51,6 @@ const options = {
 				name: 'NSFW Connection',
 				value: ConnectionType.NSFW,
 			},
-			{
-				name: 'Anonymous Connection',
-				value: ConnectionType.Anonymous,
-			},
 		],
 	}),
 	channel: createChannelOption({
@@ -75,11 +69,12 @@ export class CreateConnectionSubcommand extends SubCommand {
 		const userConnectionsCount = await connections.countDocuments({
 			creatorId: context.author.id,
 		});
+		const responses = context.t.get();
 		const CONNECTIONS_LIMIT_PER_USER = 5;
 
 		if (userConnectionsCount === CONNECTIONS_LIMIT_PER_USER)
 			return context.editOrReply({
-				content: 'You have reached your connections limit.',
+				content: responses.userReachedConnectionsLimit,
 				flags: MessageFlags.Ephemeral,
 			});
 
@@ -87,7 +82,7 @@ export class CreateConnectionSubcommand extends SubCommand {
 
 		if (name === 'invalid-connection')
 			return context.editOrReply({
-				content: 'Invalid name for a connection.',
+				content: responses.invalidConnectionName,
 				flags: MessageFlags.Ephemeral,
 			});
 
@@ -95,7 +90,7 @@ export class CreateConnectionSubcommand extends SubCommand {
 
 		if (connectionExists)
 			return context.editOrReply({
-				content: 'A connection with the same name already exists.',
+				content: responses.connectionWithSameNameExists,
 				flags: MessageFlags.Ephemeral,
 			});
 
@@ -105,43 +100,39 @@ export class CreateConnectionSubcommand extends SubCommand {
 				type: context.options.type,
 				creatorId: context.author.id,
 			}),
-			context.editOrReply({
-				content: `Your connection **${name}** has been created. Make it shine using the buttons be!low!`,
-				components: [
-					new ActionRow<Button>({
-						components: [
-							{
-								label: 'Make it Shine',
-								style: ButtonStyle.Link,
-								type: ComponentType.Button,
-								emoji: {
-									name: '✨',
-								},
-								url: 'https://connections.squareweb.app/promote',
-							},
-							{
-								style: ButtonStyle.Link,
-								label: "Let's Customize!",
-								type: ComponentType.Button,
-								url: 'https://connections.squareweb.app/dashboard',
-							},
-						],
-					}),
-				],
-			}),
+			context.editOrReply(responses.connectionCreated(name)),
 		] as Promise<unknown>[];
 
 		const { channel } = context.options;
 
-		if (channel)
+		if (channel) {
+			// biome-ignore lint/style/noNonNullAssertion: <explanation>
+			const guild = (await context.guild('flow'))!;
+			const fetchedGuild = await fetchGuild({ guild, projection: 'connections' });
+
+			if (fetchedGuild.connections?.some(({channelId})=>channelId===channel.id)) return context.write({
+
+			});
+
 			promises.push(
 				guilds.updateOne(
 					{
 						id: context.guildId,
 					},
-					{ $push: { connections: { name, channelId: channel.id, flags: 0 } } },
+					{
+						$push: {
+							connections: {
+								name,
+								channelId: channel.id,
+								flags:
+									ConnectedConnectionFlags.AllowEmojis |
+									ConnectedConnectionFlags.AllowOrigin,
+							},
+						},
+					},
 				),
 			);
+		}
 
 		await Promise.all(promises);
 	}

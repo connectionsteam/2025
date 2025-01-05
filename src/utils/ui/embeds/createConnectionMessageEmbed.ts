@@ -25,7 +25,7 @@ export const createConnectionMessageEmbed = ({
 	return {
 		author: {
 			name: message.author.username,
-			icon_url: message.author.defaultAvatarURL(),
+			icon_url: message.author.avatarURL(),
 		},
 		color: Constants.InvisibleColor,
 		footer:
@@ -37,7 +37,7 @@ export const createConnectionMessageEmbed = ({
 				: undefined,
 		image: attachment && { url: attachment },
 		description: reference
-			? `${getContent(reference.message)}\n-# Replying to ${reference.author}\n\n${content}`
+			? `${getContent(reference.message)}\n-# Replying to <@${reference.data.authorId}>\n\n${content}`
 			: content,
 	} as APIEmbed;
 };

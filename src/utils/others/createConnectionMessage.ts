@@ -1,37 +1,52 @@
 import { guilds } from '@/models/guild.model';
 import {
 	CaseType,
-	type ConnectedConnection,
 	ConnectedConnectionFlags,
+	type Guild,
 	type GuildCase,
 } from '@/types/guild';
 import type { MessageChild, ReferenceMessage } from '@/types/messages';
-import type { Guild, Message, User } from 'seyfert';
+import type { Message, Guild as SeyfertGuild, User } from 'seyfert';
 import { AllowedMentionsTypes, MessageReferenceType } from 'seyfert/lib/types';
 import { formatContent } from '../common/formatContent';
 import { createConnectionMessageEmbed } from '../ui/embeds/createConnectionMessageEmbed';
 
 interface CreateConnectionMessageOptions {
 	guild: Guild;
+	name: string;
 	message: Message;
 	repostUser?: User;
-	children?: MessageChild[];
+	children: MessageChild[];
+	originalGuild: SeyfertGuild;
 	reference?: ReferenceMessage;
-	connection: ConnectedConnection;
 	metadata: { maxChars?: number; cases: GuildCase[]; invite?: string };
 }
 
-// TODO: Não está funcionando, precisa arrumar uns negócios no handleMessage alguma coisa
 export const createConnectionMessage = async ({
+	name,
 	guild,
 	message,
 	children,
 	reference,
-	connection,
 	repostUser,
+	originalGuild,
 	metadata: { cases, invite },
 }: CreateConnectionMessageOptions) => {
-	const connectionChannel = await guild.channels.fetch(connection.channelId);
+	const fetchedGuild = await message.client.guilds
+		.fetch(guild.id)
+		.catch(() => null);
+
+	if (!fetchedGuild) return;
+
+	const connection = guild.connections?.find(
+		(connection) => connection.name === name,
+	);
+
+	if (!connection) return;
+
+	const connectionChannel = await fetchedGuild.channels.fetch(
+		connection.channelId,
+	);
 
 	if (!connectionChannel) return;
 
@@ -39,7 +54,6 @@ export const createConnectionMessage = async ({
 			return; */
 
 	const authorId = repostUser?.id ?? message.author.id;
-
 	const userCase = cases.find(
 		(crrCase) =>
 			crrCase.targetId === authorId && crrCase.connection === connection.name,
@@ -62,35 +76,28 @@ export const createConnectionMessage = async ({
 		reference?.author.allowMentions &&
 		reference.data.channelId === connectionChannel.id;
 
-	const { id } = await message.write({
-		message_reference: isMention
+	const { id } = await message.client.messages.write(connectionChannel.id, {
+		/* 		message_reference: isMention
 			? {
 					message_id: reference.message.id,
 					type: repostUser && MessageReferenceType.Forward,
 				}
-			: void 0,
-		allowed_mentions: {
-			replied_user: true,
-			parse:
-				connection.flags & ConnectedConnectionFlags.AllowMentions
-					? [AllowedMentionsTypes.User]
-					: void 0,
-		},
+			: void 0, */
 		embeds: [
 			createConnectionMessageEmbed({
-				guild,
 				invite,
 				message,
 				reference,
+				guild: originalGuild,
 				flags: connection.flags,
 				data: formatContent({ message, connection }),
 			}),
 		],
+		content: isMention ? `<@${reference.data.authorId}>` : void 0,
 	});
 
-	if (children)
-		children.push({
-			id,
-			channelId: connection.channelId,
-		});
+	children.push({
+		id,
+		channelId: connection.channelId,
+	});
 };

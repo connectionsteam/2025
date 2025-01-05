@@ -27,5 +27,4 @@ export interface ConnectionLike {
 
 export enum ConnectionType {
 	NSFW = 1,
-	Anonymous = 2,
 }

@@ -2,10 +2,10 @@ import { messages } from '@/models/messages.model';
 import { users } from '@/models/users.model';
 import type { ReferenceMessage } from '@/types/messages';
 import type { Message } from 'seyfert';
-import { resolveAuthorId } from './resolveAuthorId';
 
 export const fetchReference = async (message: Message) => {
-	const referencedMessage = message.referencedMessage!;
+	const { referencedMessage } = message;
+	if (!referencedMessage) return;
 
 	const data = await messages.findOne(
 		{
@@ -19,13 +19,8 @@ export const fetchReference = async (message: Message) => {
 	);
 
 	if (data) {
-		const userId =
-			referencedMessage.author.id === message.client.me.id
-				? resolveAuthorId(referencedMessage.embeds)
-				: message.author.id;
-
 		const author = await users.findOne(
-			{ userId },
+			{ id: data.authorId },
 			{ allowMentions: true },
 			{ lean: true },
 		);
