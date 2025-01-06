@@ -103,7 +103,13 @@ export default {
 	//#endregion
 
 	//#region Messages
-	unknownMessage: 'We could not find this message...',
+	unknownMessage: 'We could not find this message.',
+	messageQueued: {
+		delete(secs: number) {
+			return `Message queued for deletion. This will take approximately ${secs}s.`;
+		},
+	},
+	messageDoesntBelongToYou: 'This message does not belong to you.',
 	cannotRepostOwnMessage: 'You can not repost you own message.',
 	messageReposted(url: string) {
 		return `<:repost:1312857720168382567> You just reposted ${url}.`;

@@ -1,4 +1,3 @@
-import English from '@/languages/en';
 import { messages } from '@/models/messages.model';
 import { getContent } from '@/utils/others/getContent';
 import { lang, translate } from 'bing-translate-api';
@@ -21,7 +20,7 @@ export default class TranslateMessage extends Command {
 		if (!context.isMenuMessage()) return;
 
 		const { target } = context;
-		const responses = English;
+		const responses = context.t.get();
 
 		const messageExist = await messages.exists({
 			$or: [{ id: target.id }, { 'children.id': target.id }],

@@ -22,7 +22,7 @@ const client = new Client({
 
 client.setServices({
 	middlewares,
-	/* cache: {
+	cache: {
 		disabledCache: {
 			bans: true,
 			emojis: true,
@@ -36,7 +36,7 @@ client.setServices({
 			onPacket: true,
 			messages: true,
 		},
-	}, */
+	},
 });
 
 client.start().then(() => client.uploadCommands());
