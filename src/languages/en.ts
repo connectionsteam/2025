@@ -1,5 +1,6 @@
+import { lang } from 'bing-translate-api';
 import ms from 'ms';
-import { ActionRow, type Button } from 'seyfert';
+import { ActionRow, type Button, type StringSelectMenu } from 'seyfert';
 import { ButtonStyle, ComponentType } from 'seyfert/lib/types';
 
 export default {
@@ -115,6 +116,113 @@ export default {
 	},
 	userLikedMessage(message: string, likeCount: number) {
 		return `You just liked the message ${message}! Now it has **${likeCount}** likes!`;
+	},
+	unknownContent: 'Connections coult not find any content in this message.',
+	couldNotTranslateMessage:
+		'We could not translate the content of this message.',
+	translateComponents: [
+		new ActionRow<StringSelectMenu>({
+			components: [
+				{
+					type: ComponentType.StringSelect,
+					custom_id: 'language',
+					placeholder: 'Choose a custom language to translate',
+					options: [
+						{
+							value: lang.LANGS.pt,
+							label: 'Portuguese (Brazil)',
+							emoji: { name: '🇧🇷' },
+						},
+						{
+							value: lang.LANGS['pt-PT'],
+							label: 'Portuguese (Portugal)',
+							emoji: { name: '🇵🇹' },
+						},
+						{
+							value: lang.LANGS.es,
+							label: 'Spanish',
+							emoji: { name: '🇪🇸' },
+						},
+						{
+							value: lang.LANGS.fr,
+							label: 'French',
+							emoji: { name: '🇫🇷' },
+						},
+						{
+							value: lang.LANGS.lzh,
+							label: 'Chinese (Literary)',
+							emoji: { name: '🇨🇳' },
+						},
+						{
+							value: lang.LANGS.ja,
+							label: 'Japanese',
+							emoji: { name: '🇯🇵' },
+						},
+						{
+							value: lang.LANGS.en,
+							label: 'English',
+							emoji: { name: '🇺🇸' },
+						},
+						{
+							value: lang.LANGS.tr,
+							label: 'Turkish',
+							emoji: { name: '🇹🇷' },
+						},
+						{
+							value: lang.LANGS.uk,
+							label: 'Ukrainian',
+							emoji: { name: '🇺🇦' },
+						},
+						{
+							value: lang.LANGS.tk,
+							label: 'Turkmen',
+							emoji: { name: '🇹🇲' },
+						},
+						{
+							value: lang.LANGS.hr,
+							label: 'Croatian',
+							emoji: { name: '🇭🇷' },
+						},
+						{
+							value: lang.LANGS.hi,
+							label: 'Hindi',
+							emoji: { name: '🇮🇳' },
+						},
+						{
+							value: lang.LANGS.de,
+							label: 'German',
+							emoji: { name: '🇩🇪' },
+						},
+						{
+							value: lang.LANGS.ar,
+							label: 'Arabic',
+							emoji: { name: '🇸🇦' },
+						},
+					],
+				},
+			],
+		}),
+	],
+	translation(code: string, translation: string) {
+		const languages = {
+			[lang.LANGS.ar]: '🇸🇦',
+			[lang.LANGS.de]: '🇩🇪',
+			[lang.LANGS.hi]: '🇮🇳',
+			[lang.LANGS.hr]: '🇭🇷',
+			[lang.LANGS.tk]: '🇹🇲',
+			[lang.LANGS.uk]: '🇺🇦',
+			[lang.LANGS.tr]: '🇹🇷',
+			[lang.LANGS.pt]: '🇧🇷',
+			[lang.LANGS['pt-PT']]: '🇵🇹',
+			[lang.LANGS.es]: '🇪🇸',
+			[lang.LANGS.fr]: '🇫🇷',
+			[lang.LANGS.lzh]: '🇨🇳',
+			[lang.LANGS.ja]: '🇯🇵',
+			[lang.LANGS.en]: '🇺🇸',
+		};
+
+		// @ts-expect-error
+		return `${languages[code]} **${code}**: ${translation}`;
 	},
 	//#endregion
 

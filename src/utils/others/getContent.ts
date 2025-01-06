@@ -20,5 +20,7 @@ export const getContent = ({
 			isImageOrVideo({ contentType }),
 		);
 
+	if (!image) return;
+
 	return `The message has an [attachment](${image?.url})`;
 };
