@@ -100,6 +100,8 @@ export default {
 			],
 		};
 	},
+	cannotTimeoutUserInLockedConnection:
+		'You can not time out a user in a locked/inactive connection.',
 	//#endregion
 
 	//#region Messages
@@ -310,6 +312,18 @@ export default {
 			}),
 		],
 	},
+	userIsNotMod: 'You are not a mod to take this action.',
+	cantTimeoutThisUser: 'You can not time out this user or app.',
+	invalidProof: 'Invalid attachment proof. Is it an image?',
+	invalidTimeoutDuration:
+		'Invalid duration for the timeout, try the 3m format.',
+	userAlreadyTimedOut: 'This user is already timed out.',
+	userTimedOut(user: string) {
+		return `User <@${user}> has been timed out!`;
+	},
+	userIsNotTimedOut: 'This user is not timed out.',
+	cannotTimeoutABannedUser: 'You can not time out a banned user.',
+	userTimeoutRemoval: 'The timeout of this user has been removed.',
 	// #endregion
 	//#region Users
 	userDoesntHaveBoosts: {

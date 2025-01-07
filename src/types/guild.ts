@@ -71,10 +71,16 @@ export enum CaseType {
 	Timeout = 1,
 	Ban = 2,
 	GuildBan = 3,
+	/**
+	 * @deprecated Notes are useless
+	 */
 	Note = 4,
 }
 
 export type GuildBanCase = BaseCaseWithProof<CaseType.GuildBan>;
+/**
+ * @deprecated
+ */
 export type NoteCase = BaseCase<CaseType.Note>;
 
 export interface BaseCase<Type extends CaseType> {
