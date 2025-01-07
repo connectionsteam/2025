@@ -1,5 +1,6 @@
 import { guilds } from '@/models/guild.model';
 import { CaseType } from '@/types/guild';
+import { createDesc } from '@/utils/common/createDesc';
 import {
 	type CommandContext,
 	Declare,
@@ -14,9 +15,15 @@ const options = {
 	user: createUserOption({
 		required: true,
 		description: 'Enter the @mention of the user',
+		description_localizations: {
+			'pt-BR': 'Insira a @menção do usuário',
+		},
 	}),
 	connection: createStringOption({
 		description: 'Enter the name of the connection',
+		description_localizations: {
+			'pt-BR': 'Insira o nome da conexão',
+		},
 	}),
 	// TODO: Add reason option here later
 };
@@ -28,7 +35,7 @@ const options = {
 			guild: { mods: true, cases: true, connections: true },
 		},
 	},
-	description: 'Remove timeout from a user',
+	description: createDesc('Remove timeout from a user', ['unmute']),
 })
 @Middlewares(['guild'])
 export class RemoveTimeoutSubCommand extends SubCommand {

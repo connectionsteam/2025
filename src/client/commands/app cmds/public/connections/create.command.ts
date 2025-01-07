@@ -2,11 +2,12 @@ import { connections } from '@/models/connection.model';
 import { guilds } from '@/models/guild.model';
 import { ConnectionType } from '@/types/connection';
 import { ConnectedConnectionFlags } from '@/types/guild';
+import { createDesc } from '@/utils/common/createDesc';
 import { fetchGuild } from '@/utils/common/fetchGuild';
 import {
 	type CommandContext,
+	createBooleanOption,
 	createChannelOption,
-	createIntegerOption,
 } from 'seyfert';
 import { Declare, Options, SubCommand, createStringOption } from 'seyfert';
 import { ChannelType, MessageFlags } from 'seyfert/lib/types';
@@ -15,6 +16,9 @@ const options = {
 	name: createStringOption({
 		required: true,
 		description: 'Enter the connection name.',
+		description_localization: {
+			'pt-BR': 'Insira o nome da conexão.',
+		},
 		autocomplete(interaction) {
 			const name = interaction.getInput();
 			const cleanName = name
@@ -27,6 +31,9 @@ const options = {
 					{
 						name: 'Connections - Enter a valid connection name.',
 						value: 'invalid-connection',
+						name_localizations: {
+							'pt-BR': 'Connections - Insira um nome válido para a conexão.',
+						},
 					},
 				]);
 
@@ -34,31 +41,34 @@ const options = {
 				{
 					name:
 						name !== cleanName
-							? `Connections - The name is invalid, but will be replaced by "${cleanName}"`
+							? `Connections - The name is invalid, but will be replaced by "${cleanName}".`
 							: name,
 					value: cleanName,
+					name_localizations: {
+						'pt-BR': `Connections - O nome é inválido, mas será substítuido por "${cleanName}".`,
+					},
 				},
 			]);
 		},
 	}),
-	type: createIntegerOption({
-		description: 'Should the connection be NSFW or Anonymous?',
-		choices: [
-			{
-				name: 'NSFW Connection',
-				value: ConnectionType.NSFW,
-			},
-		],
+	nsfw: createBooleanOption({
+		description: 'Should the connection be NSFW?',
+		description_localizations: {
+			'pt-BR': 'A conexão deveria ser NSFW?',
+		},
 	}),
 	channel: createChannelOption({
 		description: 'Enter the channel @mention to connect the connection',
 		channel_types: [ChannelType.GuildText],
+		description_localizations: {
+			'pt-BR': 'Insira a @menção do canal para conectar a conexão',
+		},
 	}),
 };
 
 @Declare({
 	name: 'create',
-	description: 'Create a new connection.',
+	description: createDesc('Create a new connection.', ['create']),
 })
 @Options(options)
 export class CreateConnectionSubcommand extends SubCommand {
@@ -91,10 +101,11 @@ export class CreateConnectionSubcommand extends SubCommand {
 				flags: MessageFlags.Ephemeral,
 			});
 
+		const type = context.options.nsfw ? ConnectionType.NSFW : void 0;
 		const promises = [
 			connections.create({
 				name,
-				type: context.options.type,
+				type,
 				creatorId: context.author.id,
 			}),
 			context.editOrReply(responses.connectionCreated(name)),

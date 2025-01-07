@@ -1,5 +1,6 @@
 import { guilds } from '@/models/guild.model';
 import { CaseType, ConnectedConnectionFlags } from '@/types/guild';
+import { createDesc } from '@/utils/common/createDesc';
 import { isImageOrVideo } from '@/utils/others/isImageOrVideo';
 import parseMs from 'ms';
 import {
@@ -17,10 +18,16 @@ const options = {
 	user: createUserOption({
 		required: true,
 		description: 'Enter the @mention of the user to timeout',
+		description_localizations: {
+			'pt-BR': 'Insira a @menção do usuário para silenciar',
+		},
 	}),
 	duration: createStringOption({
 		required: true,
 		description: 'Duration of the timeout, 3m format',
+		description_localizations: {
+			'pt-BR': 'Duração para o silencimento, no formato 3m',
+		},
 		autocomplete(interaction) {
 			const input = interaction.getInput();
 			const parsed = parseMs(input || 'x');
@@ -30,6 +37,10 @@ const options = {
 					{
 						value: 'invalid_time',
 						name: 'Connections - Invalid timeout duration, try 3m format.',
+						name_localizations: {
+							'pt-BR':
+								'Connections - Duração do silenciamento inválida, tente no formato 3m.',
+						},
 					},
 				]);
 
@@ -41,6 +52,10 @@ const options = {
 					{
 						value: 'invalid_time',
 						name: 'Connections - Duration must be beetwen 3 minutes and 7 days.',
+						name_localizations: {
+							'pt-BR':
+								'Connections - A duração deve ser entre 3 minutos e 7 dias.',
+						},
 					},
 				]);
 
@@ -48,16 +63,25 @@ const options = {
 				{
 					value: String(parsed),
 					name: `Connections - Use ${parsed} as the duration`,
+					name_localizations: {
+						'pt-BR': `Connections - Usar ${parsed} como a duração`,
+					},
 				},
 			]);
 		},
 	}),
 	connection: createStringOption({
 		description: 'Enter the name of the connection',
+		description_localizations: {
+			'pt-BR': 'Insira o nome da conexão',
+		},
 	}),
 	reason: createStringOption({
 		min_length: 5,
 		description: 'Enter the reason for the timeout',
+		description_localizations: {
+			'pt-BR': 'Insira a razão para o silenciamento',
+		},
 	}),
 	proof: createAttachmentOption({
 		description: 'An image or video to use as proof for this action',
@@ -69,7 +93,7 @@ const options = {
 
 @Declare({
 	name: 'add',
-	description: 'Add timeout in a user',
+	description: createDesc('Add timeout in a user', ['mute']),
 	props: {
 		projection: {
 			guild: { mods: true, cases: true, connections: true },

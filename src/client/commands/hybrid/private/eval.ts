@@ -1,15 +1,17 @@
 import { inspect } from 'node:util';
+import { createDesc } from '@/utils/common/createDesc';
 import {
+	ActionRow,
+	Button,
 	Command,
 	type CommandContext,
 	Declare,
-	IgnoreCommand,
 	Middlewares,
 	Options,
 	createBooleanOption,
 	createStringOption,
 } from 'seyfert';
-import { MessageFlags } from 'seyfert/lib/types';
+import { ButtonStyle, MessageFlags } from 'seyfert/lib/types';
 
 const options = {
 	code: createStringOption({
@@ -23,8 +25,8 @@ const options = {
 
 @Declare({
 	name: 'eval',
-	ignore: IgnoreCommand.Slash,
-	description: 'Evaluate a code with Connections',
+	aliases: ['ev'],
+	description: createDesc('Run a code with Connections', ['eval', 'ev']),
 })
 @Options(options)
 @Middlewares(['dev'])
@@ -32,20 +34,51 @@ export default class EvalCommand extends Command {
 	async run(context: CommandContext<typeof options>) {
 		const { code, hide } = context.options;
 		// biome-ignore lint/security/noGlobalEval: <explanation>
-		const result = eval(code);
+		const result = await eval(code);
 
-		if (result instanceof Promise) await result;
+		const message = await context.editOrReply(
+			{
+				content: inspect(result),
+				flags: hide ? MessageFlags.Ephemeral : void 0,
+				components: [
+					new ActionRow<Button>().setComponents([
+						new Button()
+							.setCustomId('destroy')
+							.setLabel('💣')
+							.setStyle(ButtonStyle.Primary),
+					]),
+				],
+			},
+			true,
+		);
 
-		await context.editOrReply({
-			content: inspect(result),
-			flags: hide ? MessageFlags.Ephemeral : void 0,
+		message.createComponentCollector().run('destroy', async (interaction) => {
+			const messages = [
+				'Why are you trying this?',
+				'Are you still trying this?',
+				'I will not run a code for you',
+				'Stop with this',
+				'No No No',
+				'Nah bro',
+			];
+
+			if (interaction.user.id !== context.author.id)
+				return interaction.editOrReply({
+					flags: MessageFlags.Ephemeral,
+					content: messages[Math.floor(messages.length * Math.random())],
+				});
+
+			await message.delete();
+			await interaction.editOrReply({
+				flags: MessageFlags.Ephemeral,
+				content: 'Message destroyed successfully 💣',
+			});
 		});
 	}
 
-	onRunError(context: CommandContext, error: unknown) {
+	onRunError(context: CommandContext, error: Error) {
 		return context.editOrReply({
-			content: `Error: ${error}`,
-			flags: MessageFlags.Ephemeral,
+			content: `${error.name ?? 'Error'}: ${error}`,
 		});
 	}
 }

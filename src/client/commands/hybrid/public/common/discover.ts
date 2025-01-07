@@ -1,5 +1,4 @@
 import { connections } from '@/models/connection.model';
-import { ConnectionType } from '@/types/connection';
 import { Command, type CommandContext, Declare, Middlewares } from 'seyfert';
 
 @Declare({
@@ -16,8 +15,10 @@ import { Command, type CommandContext, Declare, Middlewares } from 'seyfert';
 @Middlewares(['guild'])
 export default class DiscoverCommand extends Command {
 	async run(context: CommandContext<never, 'guild'>) {
+		const responses = context.t.get();
+
 		await context.editOrReply({
-			content: 'Wait until we find good connections for you...',
+			content: responses.discordWaitMessage,
 		});
 
 		const guildConnections =
@@ -26,7 +27,6 @@ export default class DiscoverCommand extends Command {
 			.find(
 				{
 					name: { $nin: guildConnections },
-					type: { $ne: ConnectionType.Anonymous },
 					pausedAt: { $exists: false },
 				},
 				{ metadata: false, teamId: false },
@@ -36,7 +36,7 @@ export default class DiscoverCommand extends Command {
 
 		if (!fetchedConnections.length)
 			return context.editOrReply({
-				content: 'We could nto find any connection right now. Sorry.',
+				content: responses.connectionsNotFoundWithDiscover,
 			});
 
 		await context.editOrReply({

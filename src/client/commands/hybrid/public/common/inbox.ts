@@ -1,4 +1,4 @@
-import { type Notification, NotificationType } from '@/types/user';
+import { NotificationType } from '@/types/user';
 import {
 	Command,
 	type CommandContext,
@@ -13,14 +13,20 @@ import { MessageFlags } from 'seyfert/lib/types';
 const options = {
 	id: createStringOption({
 		description: 'Enter the unique ID of the notification',
+		description_localizations: {
+			'pt-BR': 'Insira o ID único da notificação',
+		},
 	}),
 	type: createIntegerOption({
 		description: 'Kind of notification to filter',
+		description_localizations: {
+			'pt-BR': 'O tipo de filtro para a notificação',
+		},
 		choices: [
 			{
 				name: 'User Replies',
 				name_localizations: {
-					'pt-BR': 'Respostas de Usuários',
+					'pt-BR': 'Respostas de Usuário',
 				},
 				value: NotificationType.Reply,
 			},
@@ -71,10 +77,11 @@ const options = {
 export default class InboxCommand extends Command {
 	async run(context: CommandContext<typeof options, 'user'>) {
 		const { user } = context.metadata;
+		const responses = context.t.get();
 
 		if (!user.notifications?.length)
 			return context.editOrReply({
-				content: 'You dont have notifications yet.',
+				content: responses.userDoesntHaveNotifications,
 				flags: MessageFlags.Ephemeral,
 			});
 
@@ -82,53 +89,10 @@ export default class InboxCommand extends Command {
 
 		if (id && type)
 			return context.editOrReply({
-				content: 'You cant use both options to fetch your notifications.',
-				flags: MessageFlags.Ephemeral,
-			});
-		if (id) return this.viewSingleNotification(context, id, user.notifications);
-
-		return this.viewNotifications(context, user.notifications, type);
-	}
-
-	viewSingleNotification(
-		context: CommandContext,
-		id: string,
-		notifications: Notification[],
-	) {
-		const notification = notifications.find(
-			(notification) => notification.id === id,
-		);
-
-		if (!notification)
-			return context.editOrReply({
-				content: 'We could not find any notification with this ID.',
+				content: responses.cantUseBothOptionsInInbox,
 				flags: MessageFlags.Ephemeral,
 			});
 
-		return context.editOrReply({
-			content: `Notificação: ${notification}`,
-			flags: MessageFlags.Ephemeral,
-		});
-	}
-
-	viewNotifications(
-		context: CommandContext,
-		notifications: Notification[],
-		type?: NotificationType,
-	) {
-		const filteredNotifications = type
-			? notifications.filter((notification) => notification.type === type)
-			: notifications;
-
-		if (filteredNotifications.length === 0)
-			return context.editOrReply({
-				content: 'No notifications found with the criteria.',
-				flags: MessageFlags.Ephemeral,
-			});
-
-		return context.editOrReply({
-			content: notifications.map((a) => `${a.id} - ${a.content}`).join('\n'),
-			flags: MessageFlags.Ephemeral,
-		});
+		await context.write(responses.inboxCommand(id, type));
 	}
 }

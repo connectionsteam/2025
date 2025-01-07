@@ -1,3 +1,4 @@
+import type { NotificationType } from '@/types/user';
 import { lang } from 'bing-translate-api';
 import ms from 'ms';
 import { ActionRow, type Button, type StringSelectMenu } from 'seyfert';
@@ -5,6 +6,9 @@ import { ButtonStyle, ComponentType } from 'seyfert/lib/types';
 
 export default {
 	//#region Connections
+	discordWaitMessage: 'Wait until we find good connections for you...',
+	connectionsNotFoundWithDiscover:
+		'We could not find any connection right now. Sorry.',
 	unknownConnection: 'We could not find a connection with this name.',
 	userCantLike(rest: number) {
 		return `You cannot like in this connection now, wait ${ms(rest, { long: true })}.`;
@@ -345,5 +349,52 @@ export default {
 		],
 	},
 	userReachedConnectionsLimit: 'You have reached your connections limit.',
+	userDoesntHaveNotifications: 'You does not have any notification yet.',
+	cantUseBothOptionsInInbox:
+		'You can not use both options to fetch your notifications.',
+	inboxCommand(id?: string, type?: NotificationType) {
+		const base = 'https://connections.squareweb.app/inbox';
+		const url = id ? `${base}?id=${id}` : type ? `${base}?type=${type}` : base;
+
+		return {
+			content:
+				'You can view your inbox with the filters with the button bellow!',
+			components: [
+				new ActionRow<Button>({
+					components: [
+						{
+							url,
+							style: ButtonStyle.Link,
+							label: 'Go to My Inbox',
+							type: ComponentType.Button,
+						},
+					],
+				}),
+			],
+		};
+	},
+	mentionCommand(state?: boolean) {
+		return `You turned your mentions ${state ? 'off' : 'on'}.`;
+	},
+	couldntFindShard: 'We could not find a shard with this ID.',
+	betaFeature: "You've discovered a beta feature! Keep it a secret.",
+	whotofollowWait: 'Wait until we find the perfect users to follow...',
+	noUsersToFollow:
+		'It looks like you do not have any users to follow at the moment...',
+	crrUserIsNotFollowThisUser(user: string) {
+		return `You are not following <@${user}>.`;
+	},
+	unfollowMessage(user: string) {
+		return `You just unfollowed <@${user}>.`;
+	},
+	cannotFollowConnections:
+		'Why you are trying to follow the best connection app? Follow me in **X**!\nhttps://x.com/connectionsbot',
+	alreadyFollowingThisUser(username: string) {
+		return `You are already following **${username}**.`;
+	},
+	cannotFollowAnApp: 'You can not follow an app.',
+	followMessage(user: string) {
+		return `✨ You just followed user <@${user}>.`;
+	},
 	//#endregion
 };

@@ -2,6 +2,7 @@ import { default as English } from '@/languages/en';
 import { connections } from '@/models/connection.model';
 import { guilds } from '@/models/guild.model';
 import { ConnectedConnectionFlags } from '@/types/guild';
+import { createDesc } from '@/utils/common/createDesc';
 import {
 	type CommandContext,
 	type DefaultLocale,
@@ -16,16 +17,22 @@ const options = {
 	name: createStringOption({
 		required: true,
 		description: 'Enter the name of the connection to join',
+		description_localizations: {
+			'pt-BR': 'Insira o nome da conexão para se juntar',
+		},
 	}),
 	channel: createChannelOption({
 		description: 'Enter the @mention of the channel to use',
 		channel_types: [ChannelType.GuildText],
+		description_localizations: {
+			'pt-BR': 'Insira a @menção do canal para usar',
+		},
 	}),
 };
 
 @Declare({
 	name: 'join',
-	description: 'Join in a new connection',
+	description: createDesc('Join in a new connection', ['join', 'connect']),
 })
 @Options(options)
 @Middlewares(['guild'])

@@ -1,3 +1,4 @@
+import { createDesc } from '@/utils/common/createDesc';
 import {
 	Command,
 	type CommandContext,
@@ -9,34 +10,33 @@ import { MessageFlags } from 'seyfert/lib/types';
 
 const options = {
 	shard: createIntegerOption({
-		required: false,
-		async autocomplete(interaction) {
-			const shards = [...interaction.client.gateway.keys()].map((shard) => ({
-				value: shard,
-				name: `See about shard #${shard}`,
-			}));
-
-			await interaction.respond(shards);
+		description: 'See about an especific shard',
+		description_localizations: {
+			'pt-BR': 'Veja sobre um fragmento específico',
 		},
-		description: 'See about an especific Connections shard',
 	}),
 };
 
 @Declare({
 	name: 'ping',
-	description: 'See the Connections latency.',
 	contexts: ['Guild'],
-	aliases: ['latency'],
+	aliases: ['latency', 'status'],
+	description: createDesc('See the Connections latency.', [
+		'ping',
+		'status',
+		'latency',
+	]),
 })
 @Options(options)
 export default class PingCommand extends Command {
 	async run(context: CommandContext<typeof options>) {
+		const responses = context.t.get();
 		const shardId = context.options.shard ?? 0;
 		const shard = context.client.gateway.get(shardId);
 
 		if (!shard)
 			return context.write({
-				content: `We could not find shard **${shardId}**... You can try without this option.`,
+				content: responses.couldntFindShard,
 				flags: MessageFlags.Ephemeral,
 			});
 

@@ -19,22 +19,22 @@ export default class FollowCommand extends Command {
 	async run(context: CommandContext<never, 'user'>) {
 		if (!context.isMenuUser()) return;
 
-		const { user: me } = context.metadata;
 		const { target } = context;
+		const responses = context.t.get();
+		const { user: me } = context.metadata;
 
 		if (target.id === context.client.me.id)
 			return context.editOrReply({
-				content:
-					'Why you are trying to follow the best connection app? Follow me in **X**!\nhttps://x.com/ConnectionsBot',
+				content: responses.cannotFollowConnections,
 			});
 		if (me.follows.includes(target.id))
 			return context.editOrReply({
-				content: `You are already following **${target.username}**.`,
+				content: responses.alreadyFollowingThisUser(target.username),
 			});
 		if (target.bot || target.system)
 			return context.editOrReply({
 				flags: MessageFlags.Ephemeral,
-				content: 'You can not follow an app.',
+				content: responses.cannotFollowAnApp,
 			});
 
 		await users.updateOne(
@@ -45,7 +45,10 @@ export default class FollowCommand extends Command {
 		);
 
 		await context.editOrReply({
-			content: `✨ You just followed user **${target.username}**`,
+			allowed_mentions: {
+				parse: [],
+			},
+			content: responses.followMessage(target.id),
 		});
 	}
 }

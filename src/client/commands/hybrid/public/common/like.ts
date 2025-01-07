@@ -1,4 +1,5 @@
 import { connections } from '@/models/connection.model';
+import { createDesc } from '@/utils/common/createDesc';
 import {
 	Command,
 	type CommandContext,
@@ -12,6 +13,9 @@ const options = {
 	connection: createStringOption({
 		required: true,
 		description: 'Enter the name of connection to like',
+		description_localizations: {
+			'pt-BR': 'Insira o nome da conexão para dar o like',
+		},
 		async autocomplete(interaction) {
 			const name = interaction.options.getAutocompleteValue();
 			const isEmpty = !name?.length;
@@ -35,10 +39,10 @@ const options = {
 				return interaction.respond([
 					{
 						value: 'unknown_connection',
-						name: 'Team - We could not find a connection with this name...',
+						name: 'Team - We could not find a connection with this name.',
 						name_localizations: {
 							'pt-BR':
-								'Time - Nós não conseguis encontrar alguma conexão com este nome...',
+								'Time - Nós não conseguimos encontrar alguma conexão com este nome.',
 						},
 					},
 				]);
@@ -60,7 +64,7 @@ const options = {
 	name: 'like',
 	aliases: ['l'],
 	contexts: ['Guild'],
-	description: 'Like any connection you want!',
+	description: createDesc('Like any connection you want!', ['like', 'l']),
 })
 @Options(options)
 export default class LikeCommand extends Command {

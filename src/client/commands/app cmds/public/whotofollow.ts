@@ -1,4 +1,5 @@
 import { users } from '@/models/users.model';
+import { createDesc } from '@/utils/common/createDesc';
 import {
 	Command,
 	type CommandContext,
@@ -9,7 +10,7 @@ import {
 
 @Declare({
 	name: 'whotofollow',
-	description: 'Discover amazing users to follow',
+	description: createDesc('Discover amazing users to follow', ['whotofollow']),
 	contexts: ['Guild'],
 	ignore: IgnoreCommand.Message,
 	props: {
@@ -21,8 +22,10 @@ import {
 @Middlewares(['user'])
 export default class WTFCommand extends Command {
 	async run(context: CommandContext<never, 'user'>) {
+		const responses = context.t.get();
+
 		await context.editOrReply({
-			content: 'Wait until we find the perfect users to follow...',
+			content: responses.whotofollowWait,
 		});
 
 		const fetchedUsers = await users.aggregate([
@@ -115,8 +118,7 @@ export default class WTFCommand extends Command {
 
 		if (!fetchedUsers.length)
 			return context.editOrReply({
-				content:
-					"It looks like you don't have any users to follow at the moment...",
+				content: responses.noUsersToFollow,
 			});
 
 		await context.editOrReply({

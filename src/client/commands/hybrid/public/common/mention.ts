@@ -1,4 +1,5 @@
 import { users } from '@/models/users.model';
+import { createDesc } from '@/utils/common/createDesc';
 import { Command, type CommandContext, Declare, Middlewares } from 'seyfert';
 import { MessageFlags } from 'seyfert/lib/types';
 
@@ -6,7 +7,7 @@ import { MessageFlags } from 'seyfert/lib/types';
 	aliases: ['m'],
 	name: 'mention',
 	contexts: ['Guild'],
-	description: 'Turn your mention on or off.',
+	description: createDesc('Turn your mention on or off.', ['mention', 'm']),
 	props: {
 		projection: { user: 'allowMentions' },
 	},
@@ -14,16 +15,19 @@ import { MessageFlags } from 'seyfert/lib/types';
 @Middlewares(['user'])
 export default class MentionCommand extends Command {
 	async run(context: CommandContext<never, 'user'>) {
+		const responses = context.t.get();
+
 		const isMentionOn = context.metadata.user.allowMentions;
 		const update = isMentionOn
 			? { $unset: { allowMentions: '' } }
 			: { $set: { allowMentions: true } };
 
-		await users.updateOne({ id: context.author.id }, update);
-
-		await context.editOrReply({
-			flags: MessageFlags.Ephemeral,
-			content: `You turned your mentions ${isMentionOn ? 'off' : 'on'}.`,
-		});
+		await Promise.allSettled([
+			users.updateOne({ id: context.author.id }, update),
+			context.editOrReply({
+				flags: MessageFlags.Ephemeral,
+				content: responses.mentionCommand(isMentionOn),
+			}),
+		]);
 	}
 }
