@@ -19,13 +19,13 @@
 <p align="center"><strong>1. Clone the repo</strong></p>
 
 ```bash
-git clone https://github.com/connectionsteam/2025.git
+git clone https://github.com/connectionsteam/2025.git connections
 ````
 
 <p align="center"><strong>2. Start with Bun</strong></p>
 
 ```bash
-bun add
+bun init
 ```
 
 <p align="center"><strong>3. Set up the ENV</strong></p>
